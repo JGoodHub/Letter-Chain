@@ -89,6 +89,9 @@ public class ScoreManager : Singleton<ScoreManager> {
                 scores[rank, position] = scores[rank, position - 1];
             }
 
+            //Trim the name to fit in the leaderboard
+            nickname = nickname.Length > 10 ? nickname.Substring(0, 10) : nickname;
+
             scores[rank, newScorePosition].nickname = nickname;
             scores[rank, newScorePosition].score = score;
 
