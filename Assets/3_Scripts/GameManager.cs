@@ -4,115 +4,75 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using GoodHub.Core;
 
-public class GameManager : Singleton<GameManager> {
 
-    [Header("Rank Settings")]
-    [SerializeField] private int[] rankTimeLimits = new int[3];
-    [SerializeField] private int[] rankVowelMinimums = new int[3];
-    public int CurrentRank { get; private set; }
+public enum Gamemode
+{
+    TIME_TRIAL,
+    SURVIVAL,
+    SANDBOX
+}
 
-    [Header("Debug")]
-    public bool clearPrefs;
+public class Statics
+{
+    public static string GAMEMODE = "gamemode";
+}
 
-    //Game state
-    private bool gameRunning;
-    private float timeRemaining;
-    IEnumerator countdownCoroutine;
+public class GameManager : Singleton<GameManager>
+{
+
+    public Gamemode gamemode;
 
     #region Inherited Methods
 
-    void Start() {
-        if (clearPrefs) {
-            PlayerPrefs.DeleteAll();
-        }
-
-        CurrentRank = PlayerPrefs.GetInt("previousRank", 0);
+    void Start()
+    {
+        gamemode = (Gamemode)PlayerPrefs.GetInt(Statics.GAMEMODE, 0);
     }
 
     #endregion
 
     #region Public Methods
 
-    public void IncrementRank() {
-        CurrentRank = (CurrentRank + 1) % 3;
-        PlayerPrefs.SetInt("previousRank", CurrentRank);
+
+    public void SetGamemode(int gamemodeIndex)
+    {
+        gamemode = (Gamemode)gamemodeIndex;
+        PlayerPrefs.SetInt(Statics.GAMEMODE, gamemodeIndex);
     }
 
-    public int GetVowelMinimum() {
-        return rankVowelMinimums[CurrentRank];
+    public void StartGame()
+    {
+        StartCoroutine(StartGameCoroutine());
     }
 
-    public void EndGame() {
-        StartCoroutine(EndGameCoroutine());
-    }
+    public void ReturnToMenu()
+    {
+        GameUIManager.Instance.HideEndGameScreens();
 
-    public void ReturnToMenu() {
-        StartCoroutine(ReturnToMenuCoroutine());
+        SceneManager.LoadScene(0);
+
+        CurtainController.Instance.RaiseCurtain();
     }
 
     #endregion
 
     #region Coroutines
 
-    public IEnumerator StartGameCoroutine() {
+    public IEnumerator StartGameCoroutine()
+    {
         CurtainController.Instance.LowerCurtain();
+
         yield return new WaitForSeconds(1f);
 
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
-        while (asyncLoad.isDone == false) {
-            yield return null;
-        }
+        SceneManager.LoadScene(1);
 
-        TileController.Instance.RegenerateTileBoard();
+        yield return null;
+
         ScoreManager.Instance.ResetCurrentGameScore();
 
-        CurtainController.Instance.RaiseCurtain();
-        UIManager.Instance.SetTime(rankTimeLimits[CurrentRank]);
-
         yield return new WaitForSeconds(1f);
 
-        timeRemaining = rankTimeLimits[CurrentRank];
-        countdownCoroutine = CountdownCoroutine();
-        StartCoroutine(countdownCoroutine);
-    }
-
-    IEnumerator CountdownCoroutine() {
-        gameRunning = true;
-        while (gameRunning) {
-            yield return new WaitForSeconds(1f);
-
-            timeRemaining -= 1f;
-            if (timeRemaining <= 0) {
-                StartCoroutine(EndGameCoroutine());
-            } else {
-                UIManager.Instance.SetTime(Mathf.RoundToInt(timeRemaining));
-            }
-        }
-    }
-
-    IEnumerator EndGameCoroutine() {
-        StopCoroutine(countdownCoroutine);
-        CurtainController.Instance.LowerCurtain();
-
-        yield return new WaitForSeconds(1f);
-
-        if (ScoreManager.Instance.IsScoreOnLeaderboard(CurrentRank, ScoreManager.Instance.GameScore)) {
-            UIManager.Instance.DisplayHighscoreDialog();
-        } else {
-            UIManager.Instance.DisplayGameoverDialog();
-        }
-    }
-
-    IEnumerator ReturnToMenuCoroutine() {
-        UIManager.Instance.HideEndGameScreens();
-
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
-        while (asyncLoad.isDone == false) {
-            yield return null;
-        }
-
-        CurtainController.Instance.RaiseCurtain();
-
+        GameTimer.Instance.StartClock();
     }
 
     #endregion

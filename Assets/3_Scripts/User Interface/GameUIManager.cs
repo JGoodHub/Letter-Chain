@@ -5,7 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using GoodHub.Core;
 
-public class UIManager : Singleton<UIManager> {
+public class GameUIManager : Singleton<GameUIManager>
+{
 
     //-----VARIABLES-----
 
@@ -16,6 +17,8 @@ public class UIManager : Singleton<UIManager> {
 
     [SerializeField] private Text lastWordText;
     [SerializeField] private Text lastWordDefinitionText;
+
+    [SerializeField] private Text lastScoreText;
 
     [Header("Gameover Elements")]
 
@@ -30,7 +33,8 @@ public class UIManager : Singleton<UIManager> {
 
     #region Inherited Methods
 
-    private void Start() {
+    private void Start()
+    {
         SetScore(0);
         DisplayWord("");
         DisplayDefinition("");
@@ -42,40 +46,53 @@ public class UIManager : Singleton<UIManager> {
 
     #region Public Methods
 
-    public void SetScore(int value) {
-        liveScoreText.text = value + "";
+    public void SetScore(int score)
+    {
+        liveScoreText.text = score.ToString();
     }
 
-    public void SetTime(int secondsRemaining) {
+    public void DisplayWordScore(int wordScore)
+    {
+        lastScoreText.text = (wordScore >= 0 ? "+" : "") + wordScore.ToString();
+    }
+
+    public void SetTime(int secondsRemaining)
+    {
         string minutes = "" + Mathf.FloorToInt(secondsRemaining / 60);
         string seconds = "" + secondsRemaining % 60;
 
-        if (seconds.Length < 2) {
+        if (seconds.Length < 2)
+        {
             seconds = "0" + seconds;
         }
 
         countdownText.text = minutes + ":" + seconds;
     }
 
-    public void DisplayWord(string word) {
+    public void DisplayWord(string word)
+    {
         lastWordText.text = word.ToUpper();
     }
 
-    public void DisplayDefinition(string definition) {
+    public void DisplayDefinition(string definition)
+    {
         lastWordDefinitionText.text = '"' + definition.Trim('"') + '"';
     }
 
-    public void DisplayGameoverDialog() {
+    public void DisplayGameoverDialog()
+    {
         gameoverScreen.SetActive(true);
         gameoverScreenScoreText.text = liveScoreText.text;
     }
 
-    public void DisplayHighscoreDialog() {
+    public void DisplayHighscoreDialog()
+    {
         highscoreScreen.SetActive(true);
         highscoreScoreText.text = liveScoreText.text;
     }
 
-    public void HideEndGameScreens() {
+    public void HideEndGameScreens()
+    {
         gameoverScreen.SetActive(false);
         highscoreScreen.SetActive(false);
     }
@@ -88,16 +105,20 @@ public class UIManager : Singleton<UIManager> {
 
     #region Event Handlers
 
-    public void EndGameEarly() {
-        GameManager.Instance.EndGame();
+    public void OnEndGameEarly()
+    {
+        GameTimer.Instance.StopClock();
     }
 
-    public void ReturnToMenu() {
+    public void OnReturnToMenu()
+    {
         GameManager.Instance.ReturnToMenu();
     }
 
-    public void SubmitNewHighscore() {
-        ScoreManager.Instance.SaveScoreToPrefs(GameManager.Instance.CurrentRank, highscoreInputNameField.text, ScoreManager.Instance.GameScore);
+    public void OnSubmitNewHighscore()
+    {
+        LeaderboardManager.Instance.AddScoreToLeaderboard(GameManager.Instance.gamemode, highscoreInputNameField.text, ScoreManager.Instance.GameScore);
+        LeaderboardManager.Instance.SaveLeaderboardToPrefs();
 
         GameManager.Instance.ReturnToMenu();
     }

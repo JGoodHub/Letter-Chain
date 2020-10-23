@@ -84,17 +84,17 @@ public class InteractionController : Singleton<InteractionController> {
             }
 
             if (TileController.Instance.DoTilesFormChain(tileChain) && DictionaryManager.Instance.ContainsWord(attemptedWord)) {
-                ScoreManager.Instance.IncreaseScore(DictionaryManager.Instance.GetWordScore(attemptedWord));
+                ScoreManager.Instance.IncreaseGameScore(DictionaryManager.Instance.GetWordScore(attemptedWord));
 
                 TileController.Instance.RemoveTiles(tileChain.ToArray());
 
-                UIManager.Instance.DisplayWord(attemptedWord + " (+" + DictionaryManager.Instance.GetWordScore(attemptedWord) + ")");
-                UIManager.Instance.DisplayDefinition(DictionaryManager.Instance.GetWordDefinition(attemptedWord));
+                GameUIManager.Instance.DisplayWord(attemptedWord);
+                GameUIManager.Instance.DisplayDefinition(DictionaryManager.Instance.GetWordDefinition(attemptedWord));
             } else {
-                ScoreManager.Instance.DecreaseScore(1);
+                ScoreManager.Instance.DecreaseGameScore(1);
 
-                UIManager.Instance.DisplayWord(attemptedWord + " (-1)");
-                UIManager.Instance.DisplayDefinition(attemptedWord + " is not a word");
+                GameUIManager.Instance.DisplayWord(attemptedWord);
+                GameUIManager.Instance.DisplayDefinition(attemptedWord + " is not a word");
                 
                 foreach (LetterTile tile in tileChain) {
                     tile.SetSelected(false);

@@ -2,47 +2,69 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GoodHub.Core {
+namespace GoodHub.Core
+{
 
-    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour {
+    public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+    {
 
         private static T _instance;
-        public static T Instance {
-            get {
-                if (_instance == null) {
+        public static T Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
                     _instance = FindObjectOfType<T>();
 
-                    if (_instance == null) {
-                        Debug.LogError("ERROR: No singleton instance of " + typeof(T) + " found, there should always be one instance");
+                    if (_instance == null)
+                    {
+                        Debug.LogError($"Error: No singleton of {typeof(T)} found, creating one instead");
 
-                        return null;
-                    } else if (FindObjectsOfType<T>().Length > 1) {
-                        Debug.LogError("ERROR: More than one singleton instance of " + typeof(T) + " found, this is not how a SINGLEton works");
+                        //Create a new gameobject to store the singleton and get it up to speed
+                        GameObject singletonObject = new GameObject($"{typeof(T)}_SINGLETON");
+                        _instance = singletonObject.AddComponent<T>();
+                        _instance.BroadcastMessage("Awake");
+                        _instance.BroadcastMessage("Start");
 
-                        return _instance;
-                    } else {
+                    }
+                    else if (FindObjectsOfType<T>().Length > 1)
+                    {
+                        Debug.LogError($"Error: More than one singleton of {typeof(T)} found, this is not how a SINGLEton works");
+
                         return _instance;
                     }
-                } else {
-                    return _instance;
+                    else
+                    {
+                        return _instance;
+                    }
                 }
+
+                return _instance;
             }
         }
 
         [Header("Singleton Settings")]
-        [SerializeField] private bool persistent;
+        [SerializeField] private bool dontDestroy;
 
-        private void Awake() {
-            if (_instance == null) {
+        private void Awake()
+        {
+            if (_instance == null)
+            {
                 _instance = Instance;
 
-                //Debug.Log("Singleton " + typeof(T).ToString() + " Instance Set");
+                _instance.gameObject.name = $"{typeof(T)}_SINGLETON";
 
-                if (persistent) {
+                //Debug.Log($"Singleton {typeof(T)} Instance Set");
+
+                if (dontDestroy)
+                {
                     _instance.transform.parent = null;
                     DontDestroyOnLoad(_instance.gameObject);
                 }
-            } else {
+            }
+            else
+            {
                 //If the instance is already set then this version of the singleton should be destroyed to maintain the pattern
                 Destroy(gameObject);
             }
