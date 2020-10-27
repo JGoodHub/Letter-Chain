@@ -41,7 +41,7 @@ public class ScoreManager : Singleton<ScoreManager>
 
         if (GameManager.Instance.gamemode == Gamemode.SURVIVAL)
         {
-            GameTimer.Instance.AddTimeToClock(amount);
+            GameTimeManager.Instance.AddTimeToClock(amount);
         }
     }
 
@@ -53,7 +53,7 @@ public class ScoreManager : Singleton<ScoreManager>
 
         if (GameManager.Instance.gamemode == Gamemode.SURVIVAL)
         {
-            GameTimer.Instance.AddTimeToClock(amount * -1);
+            GameTimeManager.Instance.AddTimeToClock(amount * -1);
         }
     }
 

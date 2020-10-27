@@ -33,7 +33,6 @@ public class GameManager : Singleton<GameManager>
 
     #region Public Methods
 
-
     public void SetGamemode(int gamemodeIndex)
     {
         gamemode = (Gamemode)gamemodeIndex;
@@ -47,6 +46,8 @@ public class GameManager : Singleton<GameManager>
 
     public void ReturnToMenu()
     {
+        MusicManager.Instance.SetTrack("Main Menu", 1f);
+
         GameUIManager.Instance.HideEndGameScreens();
 
         SceneManager.LoadScene(0);
@@ -60,6 +61,7 @@ public class GameManager : Singleton<GameManager>
 
     public IEnumerator StartGameCoroutine()
     {
+        MusicManager.Instance.SetTrack("Game", 1f);
         CurtainController.Instance.LowerCurtain();
 
         yield return new WaitForSeconds(1f);
@@ -72,7 +74,7 @@ public class GameManager : Singleton<GameManager>
 
         yield return new WaitForSeconds(1f);
 
-        GameTimer.Instance.StartClock();
+        GameTimeManager.Instance.StartClock();
     }
 
     #endregion

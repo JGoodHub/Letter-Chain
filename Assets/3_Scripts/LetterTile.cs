@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LetterTile : MonoBehaviour {
+public class LetterTile : MonoBehaviour
+{
 
     //-----VARIABLES-----
 
-    public char Letter { get; private set; }
-    public Vector2Int GridPosition { get; private set; }
-    public bool IsSelected { get; private set; }
+    [HideInInspector] public char Letter;
+    [HideInInspector] public Vector2Int GridPosition;
+    [HideInInspector] public bool IsSelected;
 
     [Header("Image Effects")]
     [SerializeField] private Image letterImage;
@@ -17,14 +18,15 @@ public class LetterTile : MonoBehaviour {
 
     [Header("Movement Parameters")]
     [SerializeField] private float tileMoveSpeed;
-    public bool TileMoving { get; private set; }
+    [HideInInspector] public bool TileMoving;
 
     //Cached references
-    public RectTransform RectTransform { get; private set; }
+    [HideInInspector] public RectTransform RectTransform;
 
     #region Inherited Methods
 
-    public override string ToString() {
+    public override string ToString()
+    {
         return "Tile " + Letter + ", " + base.ToString();
     }
 
@@ -32,7 +34,8 @@ public class LetterTile : MonoBehaviour {
 
     #region Public Methods
 
-    public void Initialise(char _tileLetter, Vector2Int _gridPosition) {
+    public void Initialise(char _tileLetter, Vector2Int _gridPosition)
+    {
         Letter = char.ToLower(_tileLetter);
         GridPosition = _gridPosition;
         RectTransform = (RectTransform)transform;
@@ -41,11 +44,15 @@ public class LetterTile : MonoBehaviour {
         SetSelected(false);
     }
 
-    public void SetSelected(bool state) {
-        if (state == true) {
+    public void SetSelected(bool state)
+    {
+        if (state == true)
+        {
             glowImage.enabled = true;
             IsSelected = true;
-        } else {
+        }
+        else
+        {
             glowImage.enabled = false;
             IsSelected = false;
         }
@@ -54,20 +61,24 @@ public class LetterTile : MonoBehaviour {
     #endregion
 
     #region Event Handlers
-    
-    public void OnTileDown() {
+
+    public void OnTileDown()
+    {
         InteractionController.Instance.StartWordChain(this);
     }
 
-    public void OnTileEnter() {
+    public void OnTileEnter()
+    {
         InteractionController.Instance.AddToWordChain(this);
     }
 
-    public void OnTileUp () {
+    public void OnTileUp()
+    {
         InteractionController.Instance.FinishWordChain();
     }
 
-    public void OnTileClicked() {
+    public void OnTileClicked()
+    {
         //SetSelected(!IsSelected);
         InteractionController.Instance.TileClicked(this);
     }
@@ -76,22 +87,26 @@ public class LetterTile : MonoBehaviour {
 
     #region Coroutines
 
-    public IEnumerator SpawnCoroutine (float delay) {
+    public IEnumerator SpawnCoroutine(float delay)
+    {
         RectTransform.localScale = Vector3.zero;
         yield return new WaitForSeconds(delay);
 
-        while (RectTransform.localScale != Vector3.one) {
+        while (RectTransform.localScale != Vector3.one)
+        {
             RectTransform.localScale = Vector3.MoveTowards(RectTransform.localScale, Vector3.one, 8f * Time.deltaTime);
             yield return null;
         }
     }
 
-    public IEnumerator MoveCoroutine(Vector2 targetAnchoredPosition, Vector2Int targetGridPosition) {
+    public IEnumerator MoveCoroutine(Vector2 targetAnchoredPosition, Vector2Int targetGridPosition)
+    {
         TileMoving = true;
 
         yield return null;
 
-        while (RectTransform.anchoredPosition.Equals(targetAnchoredPosition) == false) {
+        while (RectTransform.anchoredPosition.Equals(targetAnchoredPosition) == false)
+        {
             RectTransform.anchoredPosition = Vector2.MoveTowards(RectTransform.anchoredPosition, targetAnchoredPosition, tileMoveSpeed * Time.deltaTime);
             yield return null;
         }
@@ -101,10 +116,12 @@ public class LetterTile : MonoBehaviour {
         TileMoving = false;
     }
 
-    public IEnumerator DestroyCoroutine(float delay) {
+    public IEnumerator DestroyCoroutine(float delay)
+    {
         yield return new WaitForSeconds(delay);
 
-        while (RectTransform.localScale != Vector3.zero) {
+        while (RectTransform.localScale != Vector3.zero)
+        {
             RectTransform.localScale = Vector3.MoveTowards(RectTransform.localScale, Vector3.zero, 8f * Time.deltaTime);
             yield return null;
         }

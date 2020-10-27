@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameTimer : Singleton<GameTimer>
+public class GameTimeManager : Singleton<GameTimeManager>
 {
 
     private const int TIME_ALLOCATION = 12;
@@ -11,30 +11,36 @@ public class GameTimer : Singleton<GameTimer>
 
     [SerializeField] private GameObject addTimeEffectPrefab;
 
+    private AudioSource audioSource;
+    public AudioClip clockTick;
+
     private void Start()
     {
-        GameUIManager.Instance.SetTime(TIME_ALLOCATION);
-        timeRemaining = TIME_ALLOCATION;
+        if (GameManager.Instance.gamemode == Gamemode.SANDBOX)
+            timeRemaining = 599;
+        else
+            timeRemaining = TIME_ALLOCATION;
+
+        GameUIManager.Instance.SetTime(Mathf.RoundToInt(timeRemaining));
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void StartClock()
     {
-        StartCoroutine(CountdownCoroutine());
+        GameUIManager.Instance.SetTime(Mathf.RoundToInt(timeRemaining));
+
+        if (GameManager.Instance.gamemode != Gamemode.SANDBOX)
+            StartCoroutine(StartClockCoroutine());
     }
 
-    IEnumerator CountdownCoroutine()
+    IEnumerator StartClockCoroutine()
     {
         while (timeRemaining > 0)
         {
             yield return new WaitForSeconds(1f);
 
             timeRemaining -= 1f;
-
-
-            if (Mathf.RoundToInt(timeRemaining) % 1 == 0 && GameManager.Instance.gamemode == Gamemode.SANDBOX)
-            {
-                AddTimeToClock(120);
-            }
 
             if (timeRemaining <= 0)
             {

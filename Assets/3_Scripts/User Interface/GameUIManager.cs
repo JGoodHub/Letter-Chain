@@ -36,6 +36,8 @@ public class GameUIManager : Singleton<GameUIManager>
     private void Start()
     {
         SetScore(0);
+        DisplayWordScore(0);
+
         DisplayWord("");
         DisplayDefinition("");
 
@@ -66,7 +68,7 @@ public class GameUIManager : Singleton<GameUIManager>
             seconds = "0" + seconds;
         }
 
-        countdownText.text = minutes + ":" + seconds;
+        countdownText.text = $"{minutes}:{seconds}";
     }
 
     public void DisplayWord(string word)
@@ -107,7 +109,7 @@ public class GameUIManager : Singleton<GameUIManager>
 
     public void OnEndGameEarly()
     {
-        GameTimer.Instance.StopClock();
+        GameTimeManager.Instance.StopClock();
     }
 
     public void OnReturnToMenu()
