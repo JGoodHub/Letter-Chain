@@ -47,7 +47,7 @@ namespace GoodHub.Core
         [Header("Singleton Settings")]
         [SerializeField] private bool dontDestroy;
 
-        private void Awake()
+        protected void Awake()
         {
             if (_instance == null)
             {
@@ -55,7 +55,7 @@ namespace GoodHub.Core
 
                 _instance.gameObject.name = $"{typeof(T)}_SINGLETON";
 
-                //Debug.Log($"Singleton {typeof(T)} Instance Set");
+                Debug.Log($"Singleton {typeof(T)} Instance Set");
 
                 if (dontDestroy)
                 {

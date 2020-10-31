@@ -6,13 +6,16 @@ using UnityEngine;
 public class GameTimeManager : Singleton<GameTimeManager>
 {
 
-    private const int TIME_ALLOCATION = 12;
+    private const int TIME_ALLOCATION = 20;
     private float timeRemaining;
 
     [SerializeField] private GameObject addTimeEffectPrefab;
 
     private AudioSource audioSource;
     public AudioClip clockTick;
+    public AudioClip alarmBell;
+
+    private bool paused = false;
 
     private void Start()
     {
@@ -38,18 +41,29 @@ public class GameTimeManager : Singleton<GameTimeManager>
     {
         while (timeRemaining > 0)
         {
-            yield return new WaitForSeconds(1f);
+            float timeLastFrame = timeRemaining;
 
-            timeRemaining -= 1f;
+            yield return null;
+
+            timeRemaining -= Time.deltaTime;
+
+            if (Mathf.Ceil(timeRemaining) == Mathf.Floor(timeLastFrame) && timeRemaining <= 9)
+                audioSource.PlayOneShot(clockTick, 1f - (timeRemaining / 9f) + 0.2f);
 
             if (timeRemaining <= 0)
             {
+                audioSource.PlayOneShot(alarmBell, 1f);
+
+                GameUIManager.Instance.SetTime(0);
                 StopClock();
             }
             else
             {
-                GameUIManager.Instance.SetTime(Mathf.RoundToInt(timeRemaining));
+                GameUIManager.Instance.SetTime(Mathf.CeilToInt(timeRemaining));
             }
+
+            while (paused)
+                yield return null;
         }
     }
 
@@ -85,5 +99,15 @@ public class GameTimeManager : Singleton<GameTimeManager>
         {
             GameUIManager.Instance.DisplayGameoverDialog();
         }
+    }
+
+    public void PauseGame()
+    {
+        paused = true;
+    }
+
+    public void ResumeGame()
+    {
+        paused = false;
     }
 }

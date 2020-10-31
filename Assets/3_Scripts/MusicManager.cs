@@ -7,42 +7,44 @@ using UnityEngine;
 public class MusicManager : Singleton<MusicManager>
 {
     [Serializable]
-    public struct MusicTrack
+    public class MusicTrack
     {
-        public string name;
+        public string name = "Unamed Track";
         public AudioClip clip;
+        [Range(0f, 1f)] public float volume = 1f;
 
-        public static MusicTrack Find(MusicTrack[] entries, string name)
+        public static MusicTrack Find(MusicTrack[] tracks, string name)
         {
-            for (int i = 0; i < entries.Length; i++)
+            for (int i = 0; i < tracks.Length; i++)
             {
-                if (entries[i].name == name)
-                    return entries[i];
+                if (tracks[i].name == name)
+                    return tracks[i];
             }
 
-            return default;
+            return null;
         }
     }
 
     public MusicTrack[] tracks;
+    private MusicTrack activeTrack;
 
     private AudioSource audioSource;
 
     public string startingTrack;
-    public bool fadeInOnStart;
+    public float startFadeInTime = 3f;
 
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
 
-        audioSource.clip = MusicTrack.Find(tracks, startingTrack).clip;
+        activeTrack = MusicTrack.Find(tracks, startingTrack);
+
+        audioSource.clip = activeTrack.clip;
+        audioSource.volume = activeTrack.volume;
         audioSource.Play();
 
-        if (fadeInOnStart)
-        {
-            audioSource.volume = 0;
-            StartCoroutine(FadeInCoroutine(3f));
-        }
+        audioSource.volume = 0;
+        StartCoroutine(FadeInCoroutine(startFadeInTime));
     }
 
     public void SetTrack(string name, float fadeDuration)
@@ -52,15 +54,17 @@ public class MusicManager : Singleton<MusicManager>
         if (track.clip == null)
             return;
 
-        StartCoroutine(ChangeTrackCoroutine(track.clip, fadeDuration));
+        StartCoroutine(ChangeTrackCoroutine(track, fadeDuration));
     }
 
-    private IEnumerator ChangeTrackCoroutine(AudioClip newTrack, float fadeDuration)
+    private IEnumerator ChangeTrackCoroutine(MusicTrack newTrack, float fadeDuration)
     {
         if (fadeDuration <= 0)
         {
-            audioSource.clip = newTrack;
+            activeTrack = newTrack;
+            audioSource.clip = newTrack.clip;
             audioSource.Play();
+
             yield break;
         }
         else
@@ -69,7 +73,8 @@ public class MusicManager : Singleton<MusicManager>
 
             yield return new WaitForSeconds(fadeDuration);
 
-            audioSource.clip = newTrack;
+            activeTrack = newTrack;
+            audioSource.clip = newTrack.clip;
             audioSource.Play();
 
             StartCoroutine(FadeInCoroutine(fadeDuration));
@@ -78,9 +83,9 @@ public class MusicManager : Singleton<MusicManager>
 
     private IEnumerator FadeInCoroutine(float duration)
     {
-        float volumeChangePerSecond = 1f / Mathf.Clamp(duration, 0.1f, float.MaxValue);
+        float volumeChangePerSecond = activeTrack.volume / Mathf.Clamp(duration, 0.1f, float.MaxValue);
 
-        while (audioSource.volume < 1)
+        while (audioSource.volume < activeTrack.volume)
         {
             audioSource.volume += volumeChangePerSecond * Time.deltaTime;
             yield return null;
@@ -89,7 +94,7 @@ public class MusicManager : Singleton<MusicManager>
 
     private IEnumerator FadeOutCoroutine(float duration)
     {
-        float volumeChangePerSecond = 1f / Mathf.Clamp(duration, 0.1f, float.MaxValue);
+        float volumeChangePerSecond = activeTrack.volume / Mathf.Clamp(duration, 0.1f, float.MaxValue);
 
         while (audioSource.volume > 0)
         {

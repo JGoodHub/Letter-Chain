@@ -15,17 +15,25 @@ public enum Gamemode
 public class Statics
 {
     public static string GAMEMODE = "gamemode";
+    public static string CLEAR_PREFS = "clearPrefs_1";
 }
 
 public class GameManager : Singleton<GameManager>
 {
-
     public Gamemode gamemode;
 
     #region Inherited Methods
 
-    void Start()
+    protected void Awake()
     {
+        base.Awake();
+
+        if (PlayerPrefs.GetInt(Statics.CLEAR_PREFS, 0) == 0)
+        {
+            PlayerPrefs.DeleteAll();
+            PlayerPrefs.SetInt(Statics.CLEAR_PREFS, 1);
+        }
+
         gamemode = (Gamemode)PlayerPrefs.GetInt(Statics.GAMEMODE, 0);
     }
 
