@@ -6,7 +6,7 @@ using UnityEngine;
 public class GameTimeManager : Singleton<GameTimeManager>
 {
 
-    private const int TIME_ALLOCATION = 20;
+    private const int TIME_ALLOCATION = 60;
     private float timeRemaining;
 
     [SerializeField] private GameObject addTimeEffectPrefab;
@@ -89,11 +89,14 @@ public class GameTimeManager : Singleton<GameTimeManager>
 
         yield return new WaitForSeconds(1f);
 
-        Debug.Log(GameManager.Instance.gamemode);
-
         if (LeaderboardManager.Instance.IsScoreOnLeaderboard(GameManager.Instance.gamemode, ScoreManager.Instance.GameScore))
         {
             GameUIManager.Instance.DisplayHighscoreDialog();
+
+            yield return new WaitForSeconds(0.5f);
+
+            ScoreManager.Instance.FireConfetti();
+
         }
         else
         {

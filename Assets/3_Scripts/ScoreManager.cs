@@ -17,6 +17,8 @@ public class ScoreManager : Singleton<ScoreManager>
 
     public int GameScore { get; private set; }
 
+    public GameObject confettiCannonsPrefab;
+
     #region Inherited Methods
 
     private void Start()
@@ -60,6 +62,11 @@ public class ScoreManager : Singleton<ScoreManager>
     public void ResetGameScore()
     {
         GameScore = 0;
+    }
+
+    public void FireConfetti()
+    {
+        Destroy(Instantiate(confettiCannonsPrefab), 5f);
     }
 
     #endregion

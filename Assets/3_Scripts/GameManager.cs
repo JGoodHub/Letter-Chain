@@ -15,7 +15,7 @@ public enum Gamemode
 public class Statics
 {
     public static string GAMEMODE = "gamemode";
-    public static string CLEAR_PREFS = "clearPrefs_1";
+    public static string CLEAR_PREFS = "clearPrefs_2";
 }
 
 public class GameManager : Singleton<GameManager>
@@ -24,7 +24,7 @@ public class GameManager : Singleton<GameManager>
 
     #region Inherited Methods
 
-    protected void Awake()
+    private void Awake()
     {
         base.Awake();
 
@@ -61,6 +61,8 @@ public class GameManager : Singleton<GameManager>
         SceneManager.LoadScene(0);
 
         CurtainController.Instance.RaiseCurtain();
+
+        BannerAdManager.Instance.SetBannerState(true, 1.5f);
     }
 
     #endregion
@@ -69,6 +71,8 @@ public class GameManager : Singleton<GameManager>
 
     public IEnumerator StartGameCoroutine()
     {
+        BannerAdManager.Instance.SetBannerState(false);
+
         MusicManager.Instance.SetTrack("Game", 1f);
         CurtainController.Instance.LowerCurtain();
 

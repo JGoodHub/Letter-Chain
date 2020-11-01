@@ -66,6 +66,9 @@ public class LeaderboardManager : Singleton<LeaderboardManager>
 
     public void AddScoreToLeaderboard(Gamemode gamemode, string nickname, int score)
     {
+        if (string.IsNullOrEmpty(nickname))
+            nickname = "Unnamed";
+
         if (IsScoreOnLeaderboard(gamemode, score) == true)
         {
             for (int i = 0; i < LEADERBOARD_LEN; i++)

@@ -55,7 +55,7 @@ namespace GoodHub.Core
 
                 _instance.gameObject.name = $"{typeof(T)}_SINGLETON";
 
-                Debug.Log($"Singleton {typeof(T)} Instance Set");
+                //Debug.Log($"Singleton {typeof(T)} Instance Set");
 
                 if (dontDestroy)
                 {

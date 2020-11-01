@@ -14,6 +14,8 @@ public class MenuUIController : Singleton<MenuUIController>
     public Text newGameGamemodeText;
     public Text selectedGamemodeText;
     public Button[] selectGamemodeButtons = new Button[3];
+    public Text selectGamemodeDescriptionText;
+    public string[] selectGamemodeDescriptions = new string[3];
 
     [Header("Leaderboard Elements")]
     public Text nicknamesText;
@@ -66,6 +68,8 @@ public class MenuUIController : Singleton<MenuUIController>
                 selectedGamemodeText.text = "Sandbox";
                 break;
         }
+
+        selectGamemodeDescriptionText.text = selectGamemodeDescriptions[modeIndex];
     }
 
     public void OnDisplayScoreForGamemode(int modeIndex)
