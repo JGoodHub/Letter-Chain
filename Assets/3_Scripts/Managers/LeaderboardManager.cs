@@ -33,6 +33,11 @@ public class LeaderboardManager : Singleton<LeaderboardManager>
         LoadLeaderboardsFromPrefs();
     }
 
+    private void OnDestroy()
+    {
+        SaveLeaderboardToPrefs();
+    }
+
     #endregion
 
     #region Public Methods
@@ -102,11 +107,7 @@ public class LeaderboardManager : Singleton<LeaderboardManager>
         PlayerPrefs.SetString(SANDBOX_LEADERBOARD_KEY, sandboxLeaderboardString.Trim(','));
     }
 
-    #endregion
-
-    #region Private Methods
-
-    private void LoadLeaderboardsFromPrefs()
+    public void LoadLeaderboardsFromPrefs()
     {
         // Clear any exisiting scores
         leaderboard.Clear();

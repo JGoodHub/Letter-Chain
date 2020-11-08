@@ -6,7 +6,7 @@ using UnityEngine;
 public class GameTimeManager : Singleton<GameTimeManager>
 {
 
-    private const int TIME_ALLOCATION = 60;
+    private const int TIME_ALLOCATION = 90;
     private float timeRemaining;
 
     [SerializeField] private GameObject addTimeEffectPrefab;

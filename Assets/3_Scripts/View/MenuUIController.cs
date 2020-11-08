@@ -22,6 +22,8 @@ public class MenuUIController : Singleton<MenuUIController>
     public Text scoresText;
     public Button[] viewGamemodeButtons = new Button[3];
 
+    public GameObject dialogPrefab;
+
     #region Inherited Methods
 
     private void Start()
@@ -99,9 +101,28 @@ public class MenuUIController : Singleton<MenuUIController>
         viewGamemodeButtons[2].interactable = modeIndex != 2;
     }
 
+    public void OnClearLeaderboards()
+    {
+        ConfirmationDialog dialog = Instantiate(dialogPrefab).GetComponent<ConfirmationDialog>();
+        dialog.Message = "This will permanently clear your scores";
+
+        dialog.OnConfirmed += () =>
+        {
+            PlayerPrefs.DeleteAll();
+            LeaderboardManager.Instance.LoadLeaderboardsFromPrefs();
+            OnDisplayScoreForGamemode(GameManager.Instance.gamemode);
+        };
+    }
+
     public void OnStartGame()
     {
         GameManager.Instance.StartGame();
+    }
+
+    public void OnQuitGame()
+    {
+        LeaderboardManager.Instance.SaveLeaderboardToPrefs();
+        Application.Quit();
     }
 
     #endregion

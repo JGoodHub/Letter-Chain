@@ -130,6 +130,12 @@ namespace GoodHub.Core
             return allCleared;
         }
 
+
+        /// <summary>
+        /// Checks if the properties table contains a key
+        /// </summary>
+        /// <param name="key">Key to check for</param>
+        /// <returns>True if found</returns>
         public static bool ContainsKey(string key)
         {
             return properties.ContainsKey(key);

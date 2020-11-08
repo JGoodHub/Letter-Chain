@@ -15,7 +15,7 @@ public enum Gamemode
 public class Statics
 {
     public static string GAMEMODE = "gamemode";
-    public static string CLEAR_PREFS = "clearPrefs_2";
+    public static string CLEAR_PREFS = "clearPrefs_1";
 }
 
 public class GameManager : Singleton<GameManager>
